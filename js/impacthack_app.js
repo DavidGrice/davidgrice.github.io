@@ -123,6 +123,7 @@ camera.position.z = 20;
 controls.enableZoom = false;
 controls.enablePan = false;
 controls.update();
+controls.saveState();
 
 function removeChildren(){
     let destroy = sphere.children.length;
@@ -390,10 +391,7 @@ function onTouchStart (event) {
 
     raycaster.setFromCamera(touchTest,camera);
 
-    var intersects = raycaster.intersectObjects(sphere.children);
-
-    if(sphere.children.length > 0){
-        var intersects = raycaster.intersectObjects(sphere.children);
+        var intersects = raycaster.intersectObjects(scene.children);
 
         for (var i = 0; i < intersects.length; i++) {
             document.querySelector('#country').innerText = "Point of Interest: " + intersects[0].object.userData.country
@@ -412,9 +410,6 @@ function onTouchStart (event) {
             document.querySelector('#language').innerText = "Languages: " + intersects[0].object.userData.language
             document.querySelector('#status').innerText = "Status: " + intersects[0].object.userData.status
         }
-    }
-    else if(parent.children.length > 0) {
-        var intersects = raycaster.intersectObjects(parent.children);
         if (intersects[0].object.userData.date_2 == '') {
             document.querySelector('#source-1').style.display = 'flex';
             for (var i = 0; i < intersects.length; i++) {
@@ -448,7 +443,6 @@ function onTouchStart (event) {
                 
             }
         }
-    }
 }
 
 var slider = document.getElementById("slider");
@@ -492,15 +486,16 @@ function changeToEmbassy() {
         camera.near = 0.1;
         camera.far = 1000;
         camera.updateProjectionMatrix();
-        controls.enableZoom = false;
-        controls.enablePan = false;
-        controls.maxPolarAngle = Math.PI;
-        controls.minPolarAngle = 0;
-        controls.update();
-        camera.position.z = 20;
-        camera.position.y = 15;
-    }
 
+        controls.reset();
+        controls.update();
+    }
+    controls.enableZoom = false;
+    //camera.set(3.0260065921289407, 1.2246467991473519e-15, 19.76975680438157)
+    camera.position.z = 19.76975680438157;
+    camera.position.y = 1.2246467991473519e-15;
+    controls.reset();
+    controls.update();
 };
 
 function changeToTimeline() {
@@ -521,16 +516,17 @@ function changeToTimeline() {
         camera.near = 0.1;
         camera.far = 1000;
         camera.updateProjectionMatrix();
-        controls.enableZoom = false;
+        
         controls.enablePan = false;
         controls.maxPolarAngle = Math.PI;
         controls.minPolarAngle = 0;
+        controls.reset();
         controls.update();
-        camera.position.z = 20;
-        camera.position.y = 15;
     }
-    //addTimeline();
-
+    camera.position.z = 19.76975680438157;
+    camera.position.y = 1.2246467991473519e-15;
+    controls.reset();
+    controls.update();
 };
 
 function changeToHistory() {
@@ -538,7 +534,7 @@ function changeToHistory() {
     document.getElementById('info-box').style.display = 'none';
     document.getElementById('diplomacy-box').style.display = 'flex';
     removeChildren();
-    if(camera.fov != 60){
+    if(camera.fov != 65){
         camera.fov = 65;
         camera.near = 0.001;
         camera.far = 1000;
