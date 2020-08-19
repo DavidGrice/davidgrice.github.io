@@ -168,6 +168,9 @@ controls.enablePan = false;
 controls.update();
 controls.saveState();
 
+let isHistory = false;
+let isOther = true;
+
 // Removes the points of interest and photos from scene, freeing up memory and space to have better performance
 function removeChildren(){
     let destroy = sphere.children.length;
@@ -362,8 +365,8 @@ onMouseClick = (event) => {
     mouse.y = (-(event.clientY / window.innerHeight) * 2 + 1);
     raycaster.setFromCamera(mouse, camera);
 
-    if(sphere.children.length > 0){
-        var intersects = raycaster.intersectObjects(sphere.children);
+    if(isOther == true){
+        let intersects = raycaster.intersectObjects(sphere.children);
 
         for (var i = 0; i < intersects.length; i++) {
             document.querySelector('#country').innerText = "Point of Interest: " + intersects[0].object.userData.country
@@ -383,53 +386,59 @@ onMouseClick = (event) => {
             document.querySelector('#status').innerText = "Status: " + intersects[0].object.userData.status
         }
     }
-    else if(parent.children.length > 0) {
-        var intersects = raycaster.intersectObjects(parent.children);
-        if (intersects[0].object.userData.date_2 == '') {
-            document.querySelector('#source-1').style.display = 'flex';
+    else if(isHistory == true) {
+        document.querySelector("#source-1").removeEventListener('click', function(event) {
+            setTimeout(function() {
+                window.open(intersects[0].object.userData.source, '_blank');
+            }, 3000);
+        }, true);
+        let intersects = raycaster.intersectObjects(parent.children);
             for (var i = 0; i < intersects.length; i++) {
-                console.log(intersects[0])
-                document.querySelector('#date-1').innerText = intersects[0].object.userData.date
-                document.querySelector('#event').innerText = intersects[0].object.userData.event
-                document.querySelector("#source-1").addEventListener('click', function() {
-                    setTimeout(function() {
-                        window.open(intersects[0].object.userData.source, '_blank');
-                    }, 3000);
-                });
-            }
-        }
-        else {
-            document.querySelector('#source-2').style.display = 'flex';
-            document.querySelector('#source-1').style.display = 'flex';
-            for (var i = 0; i < intersects.length; i++) {
-                console.log(intersects[0])
-                document.querySelector('#date-1').innerText = intersects[0].object.userData.date + " - " + intersects[0].object.userData.date_2
-                document.querySelector('#event').innerText = intersects[0].object.userData.event
-                document.querySelector("#source-1").addEventListener('click', function() {
-                    setTimeout(function() {
-                        window.open(intersects[0].object.userData.source, '_blank');
-                    }, 3000);
-                });
-                document.querySelector("#source-2").addEventListener('click', function() {
-                    setTimeout(function() {
-                        window.open(intersects[0].object.userData.source_2, '_blank');
-                    }, 3000);
-                });
-                
+                if (intersects[0].object.userData.date_2 == '') {
+                    document.querySelector('#source-1').style.display = 'flex';
+                    document.querySelector('#source-2').style.display = 'none';
+                    console.log(intersects[0])
+                    document.querySelector('#date-1').innerText = intersects[0].object.userData.date;
+                    document.querySelector('#event').innerText = intersects[0].object.userData.event;
+                    document.querySelector("#source-1").setAttribute("href", intersects[0].object.userData.source);
+                    document.querySelector("#source-1").innerText = intersects[0].object.userData.type_1;
+
+            } else {
+                document.querySelector('#source-2').style.display = 'flex';
+                document.querySelector('#source-1').style.display = 'flex';
+                for (var i = 0; i < intersects.length; i++) {
+                    console.log(intersects[0])
+                    document.querySelector('#date-1').innerText = intersects[0].object.userData.date + " - " + intersects[0].object.userData.date_2;
+                    document.querySelector('#event').innerText = intersects[0].object.userData.event; 
+                    document.querySelector("#source-1").setAttribute("href", intersects[0].object.userData.source);
+                    document.querySelector("#source-2").setAttribute("href", intersects[0].object.userData.source);
+                    document.querySelector("#source-1").innerText = intersects[0].object.userData.type_1;
+                    document.querySelector("#source-2").innerText = intersects[0].object.userData.type_2;
+                }
             }
         }
     }
 }
 
+// Functions for clicking on buttons
+sourceOneFunc = () => {
+    window.open(document.querySelector("#source-1").getAttribute("href"), "_blank")
+}
+sourceTwoFunc = () => {
+    window.open(document.querySelector("#source-2").getAttribute("href"), "_blank")
+}
+
 // Same as previous function but for mboile/responsive devices
 function onTouchStart (event) {
+
     event.preventDefault();
     touchTest.x = (event.touches[0].clientX / window.innerWidth) * 2 - 1;
     touchTest.y = - (event.touches[0].clientY / window.innerHeight) * 2 + 1;
 
     raycaster.setFromCamera(touchTest,camera);
-
-        var intersects = raycaster.intersectObjects(scene.children);
+    if(isOther == true) {
+        
+        let intersects = raycaster.intersectObjects(sphere.children);
 
         for (var i = 0; i < intersects.length; i++) {
             document.querySelector('#country').innerText = "Point of Interest: " + intersects[0].object.userData.country
@@ -448,17 +457,18 @@ function onTouchStart (event) {
             document.querySelector('#language').innerText = "Languages: " + intersects[0].object.userData.language
             document.querySelector('#status').innerText = "Status: " + intersects[0].object.userData.status
         }
+    }
+    else if (isHistory == true){
+        let intersects = raycaster.intersectObjects(parent.children);
         if (intersects[0].object.userData.date_2 == '') {
             document.querySelector('#source-1').style.display = 'flex';
             for (var i = 0; i < intersects.length; i++) {
                 console.log(intersects[0])
-                document.querySelector('#date-1').innerText = intersects[0].object.userData.date
-                document.querySelector('#event').innerText = intersects[0].object.userData.event
-                document.querySelector("#source-1").addEventListener('click', function() {
-                    setTimeout(function() {
-                        window.open(intersects[0].object.userData.source, '_blank');
-                    }, 3000);
-                });
+                document.querySelector('#date-1').innerText = intersects[0].object.userData.date;
+                document.querySelector('#event').innerText = intersects[0].object.userData.event;
+                document.querySelector("#source-1").setAttribute("href", intersects[0].object.userData.source);
+                document.querySelector("#source-1").innerText = intersects[0].object.userData.type_1;
+                
             }
         }
         else {
@@ -466,21 +476,15 @@ function onTouchStart (event) {
             document.querySelector('#source-1').style.display = 'flex';
             for (var i = 0; i < intersects.length; i++) {
                 console.log(intersects[0])
-                document.querySelector('#date-1').innerText = intersects[0].object.userData.date + " - " + intersects[0].object.userData.date_2
-                document.querySelector('#event').innerText = intersects[0].object.userData.event
-                document.querySelector("#source-1").addEventListener('click', function() {
-                    setTimeout(function() {
-                        window.open(intersects[0].object.userData.source, '_blank');
-                    }, 3000);
-                });
-                document.querySelector("#source-2").addEventListener('click', function() {
-                    setTimeout(function() {
-                        window.open(intersects[0].object.userData.source_2, '_blank');
-                    }, 3000);
-                });
-                
+                document.querySelector('#date-1').innerText = intersects[0].object.userData.date + " - " + intersects[0].object.userData.date_2;
+                document.querySelector('#event').innerText = intersects[0].object.userData.event;
+                document.querySelector("#source-1").setAttribute("href", intersects[0].object.userData.source);
+                document.querySelector("#source-2").setAttribute("href", intersects[0].object.userData.source);
+                document.querySelector("#source-1").innerText = intersects[0].object.userData.type_1;
+                document.querySelector("#source-2").innerText = intersects[0].object.userData.type_2;             
             }
         }
+    }
 }
 
 // This takes the information input by user in timeline so the globe updates when number changes
@@ -512,6 +516,10 @@ animate();
 
 // This changes the scenes children to focus on the globe with wmbassies
 function changeToEmbassy() {
+    if(isOther != true) {
+        isOther = true;
+        isHistory = false;
+    }
     removeChildren();
     document.querySelector('#bureau').innerText = "Bureau: ";
     document.querySelector('#post').innerText = "Post: ";
@@ -527,6 +535,12 @@ function changeToEmbassy() {
     document.getElementById('title-subtitle').style.height = '12.5vh';    
     document.getElementById('main-title').style.fontSize = '25pt';    
     document.getElementById('main-subtitle').style.fontSize = '15pt'; 
+    document.getElementById("history").style.backgroundColor = "white";
+    document.getElementById("history").style.color = "black"; 
+    document.getElementById("timeline").style.backgroundColor = "white";
+    document.getElementById("timeline").style.color = "black"; 
+    document.getElementById("embassy").style.backgroundColor = "black";
+    document.getElementById("embassy").style.color = "white"; 
 
     // Get the data from JSON file
     for(let i = 0; i < embassy_data.length; i++){
@@ -562,6 +576,10 @@ function changeToEmbassy() {
 
 // This changes scenes children to focus on historical diplomacy
 function changeToTimeline() {
+    if(isOther != true) {
+        isOther = true;
+        isHistory = false;
+    }
     removeChildren();
     document.querySelector('#country').innerText = "Point of Interest: ";
     document.querySelector('#establish-legation').innerText = "Established Legation: ";
@@ -579,6 +597,13 @@ function changeToTimeline() {
     document.getElementById('title-subtitle').style.height = '12.5vh';    
     document.getElementById('main-title').style.fontSize = '25pt';    
     document.getElementById('main-subtitle').style.fontSize = '15pt'; 
+    document.getElementById("history").style.backgroundColor = "white";
+    document.getElementById("history").style.color = "black"; 
+    document.getElementById("embassy").style.backgroundColor = "white";
+    document.getElementById("embassy").style.color = "black"; 
+    document.getElementById("timeline").style.backgroundColor = "black";
+    document.getElementById("timeline").style.color = "white"; 
+
 
     if(camera.fov != 75){
         camera.fov = 75;
@@ -600,6 +625,10 @@ function changeToTimeline() {
 
 // This changes the scenes children to be rendering the historical timeline.
 function changeToHistory() {
+    if(isHistory != true){
+        isHistory = true;
+        isOther = false;
+    }
     document.getElementById('info-box-two').style.display = 'none';
     document.getElementById('info-box').style.display = 'none';
     document.getElementById('diplomacy-box').style.display = 'flex';
@@ -608,8 +637,14 @@ function changeToHistory() {
     document.getElementById('title-subtitle').style.width = '20vw';
     document.getElementById('title-subtitle').style.height = '12.5vh';    
     document.getElementById('main-title').style.fontSize = '25pt';    
-    document.getElementById('main-subtitle').style.fontSize = '15pt';  
-    
+    document.getElementById('main-subtitle').style.fontSize = '15pt';
+    document.getElementById("timeline").style.backgroundColor = "white";
+    document.getElementById("timeline").style.color = "black"; 
+    document.getElementById("embassy").style.backgroundColor = "white";
+    document.getElementById("embassy").style.color = "black"; 
+    document.getElementById("history").style.backgroundColor = "black";
+    document.getElementById("history").style.color = "white";    
+
     removeChildren();
     if(camera.fov != 65){
         camera.fov = 65;
@@ -707,36 +742,39 @@ function changeToHistory() {
         "61":"61.jpg"
     }
 
-    addTimelineData = (i,parent, date, date_2, event, source, source_2) => {
-            let x_position = centerX + Math.sin(startRadians) * circleRadius * 6;
-            let z_position = centerZ + Math.cos(startRadians) * circleRadius * 6;
-                let loader = new THREE.TextureLoader();
-                let texture = loader.load('img/'+arrayOfImages[i]);
-                var mesh = new THREE.Mesh( 
-                    new THREE.PlaneGeometry( camSize, .95*camSize), 
-                    new THREE.MeshBasicMaterial( {  
-                    map: texture
-                })
-                );
+    // This adds the timeline data to the scene along with assigning other needed infor for div manipulation
+    addTimelineData = (i,parent, date, date_2, event, source, source_2, type_1, type_2) => {
+        let x_position = centerX + Math.sin(startRadians) * circleRadius * 6;
+        let z_position = centerZ + Math.cos(startRadians) * circleRadius * 6;
+            let loader = new THREE.TextureLoader();
+            let texture = loader.load('img/'+arrayOfImages[i]);
+            var mesh = new THREE.Mesh( 
+                new THREE.PlaneGeometry( camSize, .95*camSize), 
+                new THREE.MeshBasicMaterial( {  
+                map: texture
+            })
+            );
+        
+            mesh.position.x = x_position;
+            mesh.position.z = z_position;
+        
+            mesh.rotation.y = i*incrementAngle * (Math.PI/180.0);
             
-                mesh.position.x = x_position;
-                mesh.position.z = z_position;
+            startRadians += incrementRadians;
             
-                mesh.rotation.y = i*incrementAngle * (Math.PI/180.0);
-                
-                startRadians += incrementRadians;
-                
-                mesh.userData.date = date;
-                mesh.userData.date_2 = date_2;
-                mesh.userData.event = event;
-                mesh.userData.source = source;
-                mesh.userData.source_2 = source_2;
+            mesh.userData.date = date;
+            mesh.userData.date_2 = date_2;
+            mesh.userData.event = event;
+            mesh.userData.source = source;
+            mesh.userData.source_2 = source_2;
+            mesh.userData.type_1 = type_1;
+            mesh.userData.type_2 = type_2;
 
-                parent.add( mesh ); 
+            parent.add( mesh ); 
     }
 
     for ( let i = 0; i < diplomacy_timeline.length; i++ ) {
-        addTimelineData(i, parent, diplomacy_timeline[i].Date, diplomacy_timeline[i].Date_2, diplomacy_timeline[i].Event, diplomacy_timeline[i].Source_1, diplomacy_timeline[i].Source_2)
+        addTimelineData(i, parent, diplomacy_timeline[i].Date, diplomacy_timeline[i].Date_2, diplomacy_timeline[i].Event, diplomacy_timeline[i].Source_1, diplomacy_timeline[i].Source_2,diplomacy_timeline[i].Type_1, diplomacy_timeline[i].Type_2)
     }
     camera.updateProjectionMatrix();
 }
