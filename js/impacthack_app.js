@@ -370,7 +370,6 @@ onMouseClick = (event) => {
     if(isOther == true){
         let intersects = raycaster.intersectObjects(sphere.children);
         for (var i = 0; i < intersects.length; i++) {
-            controls.update();
             document.querySelector('#country').innerText = "Point of Interest: " + intersects[0].object.userData.country
             document.querySelector('#establish-legation').innerText = "Established Legation: " + intersects[0].object.userData.establish_legation
             document.querySelector('#elevate-to-embassy').innerText = "Elevated to Embassy: " + intersects[0].object.userData.elevate_to_embassy
@@ -378,9 +377,6 @@ onMouseClick = (event) => {
             document.querySelector('#closure').innerText = "Closed: " + intersects[0].object.userData.closure
             document.querySelector('#reopen-legation').innerText = "Reopened Legation: " + intersects[0].object.userData.reopen_legation
             document.querySelector('#reopen-embassy').innerText = "Reopened Embassy: " + intersects[0].object.userData.reopen_embassy
-            const item = intersects[0];
-            var point = item.point;
-            var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
         }
         for (var i = 0; i < intersects.length; i++) {
             document.querySelector('#bureau').innerText = "Bureau: " + intersects[0].object.userData.bureau
@@ -392,17 +388,13 @@ onMouseClick = (event) => {
             document.getElementById('more-info-box').style.display = 'flex';
             document.querySelector("#social-url").setAttribute("href", intersects[0].object.userData.social_url);
             document.querySelector("#embassy-url").setAttribute("href", intersects[0].object.userData.embassy_url);
-            const item = intersects[0];
-            var point = item.point;
-            var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
         }
+        const item = intersects[0];
+        var point = item.point;
+        var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
+        controls.update();
     }
     else if(isHistory == true) {
-        document.querySelector("#source-1").removeEventListener('click', function(event) {
-            setTimeout(function() {
-                window.open(intersects[0].object.userData.source, '_blank');
-            }, 3000);
-        }, true);
         let intersects = raycaster.intersectObjects(parent.children);
             for (var i = 0; i < intersects.length; i++) {
                 if (intersects[0].object.userData.date_2 == '') {
@@ -413,9 +405,6 @@ onMouseClick = (event) => {
                     document.querySelector('#event').innerText = intersects[0].object.userData.event;
                     document.querySelector("#source-1").setAttribute("href", intersects[0].object.userData.source);
                     document.querySelector("#source-1").innerText = intersects[0].object.userData.type_1;
-                    const item = intersects[0];
-                    var point = item.point;
-                    var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
 
             } else {
                 document.querySelector('#source-2').style.display = 'flex';
@@ -428,11 +417,12 @@ onMouseClick = (event) => {
                     document.querySelector("#source-2").setAttribute("href", intersects[0].object.userData.source);
                     document.querySelector("#source-1").innerText = intersects[0].object.userData.type_1;
                     document.querySelector("#source-2").innerText = intersects[0].object.userData.type_2;
-                    const item = intersects[0];
-                    var point = item.point;
-                    var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
                 }
             }
+            const item = intersects[0];
+            var point = item.point;
+            var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
+            controls.update();
         }
     }
 }
@@ -470,7 +460,6 @@ function onTouchStart (event) {
 
     raycaster.setFromCamera(touchTest,camera);
     if(isOther == true) {
-        
         let intersects = raycaster.intersectObjects(sphere.children);
 
         for (var i = 0; i < intersects.length; i++) {
@@ -493,6 +482,10 @@ function onTouchStart (event) {
             document.querySelector("#social-url").setAttribute("href", intersects[0].object.userData.social_url);
             document.querySelector("#embassy-url").setAttribute("href", intersects[0].object.userData.embassy_url);
         }
+        const item = intersects[0];
+        var point = item.point;
+        var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
+        controls.update();
     }
     else if (isHistory == true){
         let intersects = raycaster.intersectObjects(parent.children);
@@ -520,6 +513,10 @@ function onTouchStart (event) {
                 document.querySelector("#source-2").innerText = intersects[0].object.userData.type_2;             
             }
         }
+        const item = intersects[0];
+        var point = item.point;
+        var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
+        controls.update();
     }
 }
 
@@ -555,6 +552,7 @@ animate();
 function changeToEmbassy() {
     hidden = true;
     document.querySelector("#help-box").style.display = 'none'
+    document.querySelector("#more-info-box").style.display = 'none'
     if(isOther != true) {
         isOther = true;
         isHistory = false;
@@ -620,6 +618,7 @@ function changeToEmbassy() {
 function changeToTimeline() {
     hidden = true;
     document.querySelector("#help-box").style.display = 'none'
+    document.getElementById('more-info-box').style.display = 'none';
     if(isOther != true) {
         isOther = true;
         isHistory = false;
@@ -673,6 +672,7 @@ function changeToTimeline() {
 function changeToHistory() {
     hidden = true;
     document.querySelector("#help-box").style.display = 'none'
+    document.getElementById('more-info-box').style.display = 'none';
     if(isHistory != true){
         isHistory = true;
         isOther = false;
