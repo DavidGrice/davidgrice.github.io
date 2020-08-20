@@ -163,7 +163,8 @@ addSceneObjects(scene, camera, renderer);
 camera.position.z = 20;
 
 // Disable control function, so users do not zoom too far in or pan away from center
-controls.enableZoom = false;
+controls.minDistance = 12;
+controls.maxDistance = 30;
 controls.enablePan = false;
 controls.update();
 controls.saveState();
@@ -368,8 +369,8 @@ onMouseClick = (event) => {
 
     if(isOther == true){
         let intersects = raycaster.intersectObjects(sphere.children);
-
         for (var i = 0; i < intersects.length; i++) {
+            controls.update();
             document.querySelector('#country').innerText = "Point of Interest: " + intersects[0].object.userData.country
             document.querySelector('#establish-legation').innerText = "Established Legation: " + intersects[0].object.userData.establish_legation
             document.querySelector('#elevate-to-embassy').innerText = "Elevated to Embassy: " + intersects[0].object.userData.elevate_to_embassy
@@ -377,6 +378,9 @@ onMouseClick = (event) => {
             document.querySelector('#closure').innerText = "Closed: " + intersects[0].object.userData.closure
             document.querySelector('#reopen-legation').innerText = "Reopened Legation: " + intersects[0].object.userData.reopen_legation
             document.querySelector('#reopen-embassy').innerText = "Reopened Embassy: " + intersects[0].object.userData.reopen_embassy
+            const item = intersects[0];
+            var point = item.point;
+            var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
         }
         for (var i = 0; i < intersects.length; i++) {
             document.querySelector('#bureau').innerText = "Bureau: " + intersects[0].object.userData.bureau
@@ -385,6 +389,12 @@ onMouseClick = (event) => {
             document.querySelector('#country-two').innerText = "Country: " + intersects[0].object.userData.country
             document.querySelector('#language').innerText = "Languages: " + intersects[0].object.userData.language
             document.querySelector('#status').innerText = "Status: " + intersects[0].object.userData.status
+            document.getElementById('more-info-box').style.display = 'flex';
+            document.querySelector("#social-url").setAttribute("href", intersects[0].object.userData.social_url);
+            document.querySelector("#embassy-url").setAttribute("href", intersects[0].object.userData.embassy_url);
+            const item = intersects[0];
+            var point = item.point;
+            var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
         }
     }
     else if(isHistory == true) {
@@ -403,6 +413,9 @@ onMouseClick = (event) => {
                     document.querySelector('#event').innerText = intersects[0].object.userData.event;
                     document.querySelector("#source-1").setAttribute("href", intersects[0].object.userData.source);
                     document.querySelector("#source-1").innerText = intersects[0].object.userData.type_1;
+                    const item = intersects[0];
+                    var point = item.point;
+                    var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
 
             } else {
                 document.querySelector('#source-2').style.display = 'flex';
@@ -415,6 +428,9 @@ onMouseClick = (event) => {
                     document.querySelector("#source-2").setAttribute("href", intersects[0].object.userData.source);
                     document.querySelector("#source-1").innerText = intersects[0].object.userData.type_1;
                     document.querySelector("#source-2").innerText = intersects[0].object.userData.type_2;
+                    const item = intersects[0];
+                    var point = item.point;
+                    var camDistance = camera.position.copy(point).normalize.multiplyScalar(camDistance)
                 }
             }
         }
@@ -515,6 +531,7 @@ slider.addEventListener("input", addTimeline);
 document.getElementById('info-box').style.display = 'none';
 document.getElementById('info-box-two').style.display = 'none';
 document.getElementById('diplomacy-box').style.display = 'none';
+document.getElementById('more-info-box').style.display = 'none';
 
 // Add event listeners so DOM knows what functions to use when objects/items are interacted with
 window.addEventListener('resize', onWindowResize, false);
@@ -567,7 +584,7 @@ function changeToEmbassy() {
     // Get the data from JSON file
     for(let i = 0; i < embassy_data.length; i++){
         if(embassy_data[i].Bureau==='EUR'){
-            addEmbassyCoord(sphere,embassy_data[i].Latitude, embassy_data[i].Longitude, 'red', embassy_data[i].Post, embassy_data[i].Bureau, embassy_data[i].Country, embassy_data[i].Languages, embassy_data[i].Status, embassy_data[i].Social, embassy_data[i].Embassy_Url);
+            addEmbassyCoord(sphere,embassy_data[i].Latitude, embassy_data[i].Longitude, 'deepskyblue', embassy_data[i].Post, embassy_data[i].Bureau, embassy_data[i].Country, embassy_data[i].Languages, embassy_data[i].Status, embassy_data[i].Social, embassy_data[i].Embassy_Url);
         } else if(embassy_data[i].Bureau==='NEA') {
             addEmbassyCoord(sphere,embassy_data[i].Latitude, embassy_data[i].Longitude, 'orange', embassy_data[i].Post, embassy_data[i].Bureau, embassy_data[i].Country, embassy_data[i].Languages, embassy_data[i].Status, embassy_data[i].Social, embassy_data[i].Embassy_Url);
         } else if(embassy_data[i].Bureau==='SCA') {
@@ -585,6 +602,9 @@ function changeToEmbassy() {
         camera.near = 0.1;
         camera.far = 1000;
         camera.updateProjectionMatrix();
+        controls.enableZoom = true;
+        controls.minDistance = 12;
+        controls.maxDistance = 30;
         controls.minPolarAngle = 0;
         controls.maxPolarAngle = Math.PI;
         controls.reset();
@@ -634,8 +654,9 @@ function changeToTimeline() {
         camera.near = 0.1;
         camera.far = 1000;
         camera.updateProjectionMatrix();
-        
-        controls.enablePan = false;
+        controls.enableZoom = true;
+        controls.minDistance = 12;
+        controls.maxDistance = 30;
         controls.maxPolarAngle = Math.PI;
         controls.minPolarAngle = 0;
         controls.reset();
@@ -681,6 +702,8 @@ function changeToHistory() {
         camera.position.z = 1535;
         controls.enableZoom = false;
         controls.enablePan = false;
+        controls.minDistance = 1535;
+        controls.maxDistance = 1535;
         controls.maxPolarAngle = 1.54;
         controls.minPolarAngle = 1.54;
         controls.rotateSpeed = 0.5;
